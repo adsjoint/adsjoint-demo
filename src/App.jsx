@@ -28,6 +28,7 @@ export default function App() {
     // Step 1 (Required): initialize the Adsjoint SDK with your app info
     initAdsjoint({
       publisherName: "test_llm_1",    // unique name of your LLM app (e.g., "ChatGPT", "MyAwesomeBot")
+      mode: "test", // Demo ads only; production is the SDK default
       publisherId: "6824750189",        // your publisher ID (string), provided by Adsjoint
     });
 
@@ -56,6 +57,8 @@ export default function App() {
   return (
     <div style={{ padding: 24, maxWidth: 600, margin: "0 auto" }}>
       <h2>💬 LLM Chat + Adsjoint SDK Demo</h2>
+      <p>This demo uses simulated AI replies. No LLM API key is needed.</p>
+      <p>To test an ad, send <code>ADSJOINT_DEMO_TRAVEL</code> or <code>ADSJOINT_DEMO_GAME</code>. Ordinary words do not trigger demo ads.</p>
 
       <div
         style={{
