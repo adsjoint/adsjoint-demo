@@ -57,7 +57,6 @@ export default function App() {
   return (
     <div style={{ padding: 24, maxWidth: 600, margin: "0 auto" }}>
       <h2>💬 LLM Chat + Adsjoint SDK Demo</h2>
-      <p>This demo uses simulated AI replies. No LLM API key is needed.</p>
       <p>To test an ad, send <code>ADSJOINT_DEMO_TRAVEL</code> or <code>ADSJOINT_DEMO_GAME</code>. Ordinary words do not trigger demo ads.</p>
 
       <div

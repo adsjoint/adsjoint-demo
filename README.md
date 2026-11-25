@@ -1,101 +1,104 @@
-# Adsjoint integration demo
+# 💬 Adsjoint Demo
 
-A React + Vite chat example using `@adsjoint/sdk@1.1.0` in explicit test mode.
-Replies are simulated locally; no OpenAI account, API key, or credits are needed.
+A minimal demo showing how to integrate the **@adsjoint/sdk** into an LLM-based chat app.
 
-## Install and run
+> 🧩 Adsjoint helps LLM apps monetize through context-aware ads — automatically placed in chat with smart delivery.
 
-Ask admin@adsjoint.ai for package access and your publisher name and ID.
-Package installation requires your own GitHub personal access token **(classic)**
-with `read:packages` permission and an account authorized to download the SDK.
-This GitHub token is separate from publisher credentials. No separate Adsjoint API key is required.
+---
+## 🖼️ Live Example — What Inline Ads Look Like
+Here’s an example of what the Adsjoint inline ad looks like inside a chat interface:
+<img width="500" height="500" alt="image" src="https://github.com/user-attachments/assets/fa937877-7e3e-479f-a74a-54e2d946a068" />
+<br><br>
+## 🤝 Adsjoint Early Partner Program
+An early-stage research initiative exploring monetization infrastructure for LLM-native applications.
+### 🎁 Early Partner Benefits
+1. Preferential revenue share after GA
+2. Top priority for the first real advertisers once campaigns begin
+3. Influence product decisions (ad UI, frequency rules, categories)
 
-```sh
+### 🛠️ What you get today
+1. Demo ads for travel and games (test mode)
+2. Context-aware inline ads insertion
+3. Production campaign event tracking (requires backend setup; test events are console-only).
+<br><br>
+## 🚀 Quick Start
+### 0️⃣ Get Access
+Contact **admin@adsjoint.ai** to request your publisher credentials and SDK package access. No separate Adsjoint API key is required.
+### 1️⃣ Clone the Repo
+```bash
 git clone https://github.com/adsjoint/adsjoint-demo.git
 cd adsjoint-demo
 ```
-
-Create a local `.npmrc` (ignored by Git):
-
-```ini
+### 2️⃣ Add Your .npmrc File
+Create a new .npmrc file and open it in your default text editor, paste the following content inside the file:
+```bash
 @adsjoint:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
 ```
-
-Set `NODE_AUTH_TOKEN` in your local environment to your GitHub token. Do not commit
-or share the token or put it in browser code. Then run:
-
-```sh
-npm ci
-npm start
+🪪 Replace YOUR_GITHUB_TOKEN with your GitHub Personal Access Token (classic)
+(must include read:packages permission).
+This allows npm to authenticate with GitHub Packages and download the private SDK.
+### 3️⃣ SDK Integration
+#### 1. Installation
+```bash
+npm login --registry=https://npm.pkg.github.com --scope=@adsjoint
+npm install @adsjoint/sdk
 ```
+#### 2. Initialization with Your Publisher Credentials
+In src/App.jsx (or wherever you set up your chat logic), initialize the Adsjoint SDK with your assigned credentials:
+```bash
+initAdsjoint({
+  publisherName: "demo_llm_app",    // unique name of your LLM app (e.g., "ChatGPT", "MyAwesomeBot")
+  mode: "test",                     // use "production" (or "prod") for real campaigns
+  publisherId: "01234567890"        // your publisher ID (string), provided by Adsjoint
+});
+```
+💡 These credentials identify your app to the Adsjoint platform and ensure impressions/clicks are properly tracked.
+#### 3. Inline Ads Placement
+In src/App.jsx (or wherever you set up your chat logic), insert the Adsjoint ad component where your AI messages are displayed
+```bash
+<InlineAdBanner message={msg} />
+```
+### 4️⃣ Run
+```bash
+  npm start
+```
+In this demo, AI replies are simulated; no LLM API key is needed. In test mode,
+send `ADSJOINT_DEMO_TRAVEL` or `ADSJOINT_DEMO_GAME` (exact, case-sensitive markers)
+to trigger a demo ad. Ordinary words such as "travel" and "game" do not trigger demo ads.
+Frequency limits still apply; reload the page to reset them.
 
-Open the local URL Vite prints. Replace the example publisher name and ID in `src/App.jsx`
-with your assigned values when integrating into your own app.
+The SDK defaults to `mode: "production"` (`"prod"` also works). Production never
+shows demo ads and requires a configured campaign backend. Without backend setup
+or an eligible campaign, no ad is displayed. Test events do not consume campaign budgets.
 
-## Test ads
-
-The demo explicitly initializes the SDK with `mode: "test"`. Send either exact,
-case-sensitive marker:
-
-- `ADSJOINT_DEMO_TRAVEL`
-- `ADSJOINT_DEMO_GAME`
-
-The simulated AI reply repeats the marker and can display the corresponding demo ad.
-Ordinary words such as "travel" and "game" do not trigger demo ads. Only travel and
-game demo inventory is bundled. Test events are console-only, do not enter production
-analytics, and never consume campaign budgets.
-
-Frequency limits still apply: each category displays once per page lifetime, with
-at least two new AI messages since the previous ad. To try the second category,
-send an ordinary message first, then its marker. Reload to reset the in-memory limits.
-
-## Integrate into your app
-
-```jsx
+### Minimal Usage Example
+```js
 import { initAdsjoint, initAdLogic, InlineAdBanner } from "@adsjoint/sdk";
 
-// Initialize once before rendering ads.
 initAdsjoint({
-  publisherName: "your_app",
-  publisherId: "YOUR_PUBLISHER_ID",
-  mode: "test",
+  publisherName: "demo_llm_app",
+  publisherId: "01234567890",
+  mode: "test"
 });
+
 initAdLogic(true);
 
-// Place below a completed AI response:
-<InlineAdBanner message={{ sender: "ai", text: responseText }} />
+export default function App() {
+  const [messages, setMessages] = useState([]);
+
+  return (
+    <div>
+      {messages.map((msg, i) => (
+        <div key={i}>
+          <MessageBubble msg={msg} />
+          <InlineAdBanner message={msg} />
+        </div>
+      ))}
+    </div>
+  );
+}
 ```
-
-## Production
-
-SDK 1.1.0 defaults to `mode: "production"`; `"prod"` is also accepted.
-Production never displays bundled demo ads, even when a demo marker appears.
-Without a configured campaign backend or eligible campaign, no ad is displayed.
-
-```js
-initAdsjoint({
-  publisherName: "your_app",
-  publisherId: "YOUR_PUBLISHER_ID",
-  mode: "production",
-  backend: {
-    url: "https://YOUR_PROJECT.supabase.co",
-    anonKey: "YOUR_PUBLIC_ANON_OR_PUBLISHABLE_KEY",
-  },
-});
-initAdLogic(true);
-```
-
-Coordinate backend setup with Adsjoint before enabling production. Never use a
-Supabase service-role key in the browser. The campaign schema and setup instructions
-are in [the SDK repository](https://github.com/adsjoint/sdk/blob/main/sdk/CAMPAIGNS.md)
-(repository access may be required). Providing backend configuration alone does not
-create campaign tables. The pilot backend needs authentication/rate limiting and
-fraud protection before paid rollout.
-
-Campaign matching happens locally. The production campaign path sends the matched
-category and publisher ID for delivery, then a delivery ID and event type for
-impressions/clicks; it does not send conversation text. Creative images load from
-external image hosts and ad clicks open their destination websites.
-
-Contact: admin@adsjoint.ai
+## 💬 Support
+📧 Email: admin@adsjoint.ai \
+🌐 Website: https://adsjoint.ai (WIP)
